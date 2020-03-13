@@ -1,51 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:preferenciasusuarioapp/src/share_prefs/preferencias_usuario.dart';
 import 'package:preferenciasusuarioapp/src/widgets/menu_widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
-  static final String routeName = "settings";
+  static final String routeName = 'settings';
 
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool _colorSecundario = true;
+  bool _colorSecundario;
   int _genero;
-  String _nombre;
+  String _nombre = 'Pedro';
+
   TextEditingController _textController;
+
   final prefs = new PreferenciasUsuario();
+
   @override
   void initState() {
     super.initState();
+
+    prefs.ultimaPagina = SettingsPage.routeName;
     _genero = prefs.genero;
     _colorSecundario = prefs.colorSecundario;
 
-    _textController = new TextEditingController(text: prefs.nombre);
+    _textController = new TextEditingController(text: prefs.nombreUsuario);
+  }
+
+  _setSelectedRadio(int valor) {
+    prefs.genero = valor;
+    _genero = valor;
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          title: Text('Ajustes'),
           backgroundColor: (prefs.colorSecundario) ? Colors.teal : Colors.blue,
-          title: Text("Preferencias"),
         ),
         drawer: MenuWidget(),
         body: ListView(
           children: <Widget>[
             Container(
-              padding: EdgeInsets.all(5),
-              child: Text(
-                'Preferencias',
-                style: TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
-              ),
+              padding: EdgeInsets.all(5.0),
+              child: Text('Settings',
+                  style:
+                      TextStyle(fontSize: 45.0, fontWeight: FontWeight.bold)),
             ),
             Divider(),
             SwitchListTile(
               value: _colorSecundario,
-              title: Text('Color de la interfaz'),
+              title: Text('Color secundario'),
               onChanged: (value) {
                 setState(() {
                   _colorSecundario = value;
@@ -53,54 +62,32 @@ class _SettingsPageState extends State<SettingsPage> {
                 });
               },
             ),
-            Divider(),
-            Container(
-              padding: EdgeInsets.all(20),
-              child: Text(
-                'Elige tu género (si puedes)',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
             RadioListTile(
               value: 1,
+              title: Text('Masculino'),
               groupValue: _genero,
-              title: Text("Masculino"),
               onChanged: _setSelectedRadio,
             ),
             RadioListTile(
-              value: 2,
-              groupValue: _genero,
-              title: Text("Femenino"),
-              onChanged: _setSelectedRadio,
-            ),
-            RadioListTile(
-              value: 3,
-              groupValue: _genero,
-              title: Text(
-                  "Personas con notable retraso madurativo que pretenden cambiar el lenguaje del resto del mundo para que ellas no se sientan ofendidas"),
-              onChanged: _setSelectedRadio,
-            ),
+                value: 2,
+                title: Text('Femenino'),
+                groupValue: _genero,
+                onChanged: _setSelectedRadio),
             Divider(),
             Container(
-              padding: EdgeInsets.all(20),
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
               child: TextField(
                 controller: _textController,
                 decoration: InputDecoration(
                   labelText: 'Nombre',
-                  helperText: 'Nombre del usuario',
+                  helperText: 'Nombre de la persona usando el teléfono',
                 ),
                 onChanged: (value) {
-                  prefs.nombre = value;
+                  prefs.nombreUsuario = value;
                 },
               ),
             )
           ],
         ));
-  }
-
-  _setSelectedRadio(int valor) async {
-    prefs.genero = valor;
-    _genero = valor;
-    setState(() {});
   }
 }
